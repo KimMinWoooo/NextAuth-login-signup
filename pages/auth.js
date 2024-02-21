@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import AuthForm from '../components/auth/auth-form';
 
 function AuthPage() {
-  const [isLoading, setIsLoading] = useState();
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {

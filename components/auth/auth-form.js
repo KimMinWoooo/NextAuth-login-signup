@@ -5,16 +5,17 @@ import classes from "./auth-form.module.css";
 import { signIn } from "next-auth/react";
 
 
-async function createUser(email, password) {
+async function createUser(email, password, role) {
   const response = await fetch("/user/join", {
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, role }),
     headers: {
       "Content-Type": "application/json",
     },
   });
 
   const data = await response.json();
+  
 
   if (!response.ok) {
     throw new Error(data.message || "Something went wrong!");
@@ -26,6 +27,7 @@ function AuthForm() {
   
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
+  const roleInputRef = useRef();
 
   const [isLogin, setIsLogin] = useState(true);
   const router = useRouter();
@@ -39,12 +41,13 @@ function AuthForm() {
 
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
+    const enteredRole = roleInputRef.current.value;
 
     if (isLogin) {
       const result = await signIn("credentials", {
         redirect: false,
         email: enteredEmail,
-        password: enteredPassword,
+        password: enteredPassword
       }); // 우리가 로그인 확인 로그인 front 작업
       
       if (!result.error) {
@@ -52,7 +55,7 @@ function AuthForm() {
       }
     } else {
       try {
-        const result = await createUser(enteredEmail, enteredPassword);
+        const result = await createUser(enteredEmail, enteredPassword, enteredRole);
         console.log(result);
       } catch (error) {
         console.log(error);
@@ -66,7 +69,7 @@ function AuthForm() {
       <form onSubmit={submitHandler}>
         <div className={classes.control}>
           <label htmlFor="email">이메일</label>
-          <input type="email" id="email" required ref={emailInputRef} />
+          <input type="email" id="email"  required ref={emailInputRef} />
         </div>
         <div className={classes.control}>
           <label htmlFor="password">비밀번호</label>
@@ -76,6 +79,10 @@ function AuthForm() {
             required
             ref={passwordInputRef}
           />
+        </div>
+        <div className={classes.control}>
+          <label htmlFor="role">역할</label>
+          <input type="role" id="role" required ref={roleInputRef} />
         </div>
         <div className={classes.actions}>
           <button>{isLogin ? "로그인" : "계정 생성하기"}</button>

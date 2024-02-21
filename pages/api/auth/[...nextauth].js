@@ -1,7 +1,7 @@
-import { verifyPassword } from '../../../lib/auth';
-import { connectToDatabase } from '../../../lib/db';
-import  NextAuth  from 'next-auth';
-import  CredentialsProvider  from 'next-auth/providers/credentials';
+import { verifyPassword } from "../../../lib/auth";
+
+import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 export default NextAuth({
   session: {
@@ -9,33 +9,21 @@ export default NextAuth({
   },
   providers: [
     CredentialsProvider({
-      async authorize(credentials) {
-        const client = await connectToDatabase();
+      async authorize(credentials, req) {
+        const { email, password } = credentials;
+
+        // 로그인 요청을 보냅니다.
+        const response = await fetch(`http://localhost:8888/user/login`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+          });
+
+        const user = await response.json();
         
-
-        const usersCollection = client.db().collection('users');
-
-        const user = await usersCollection.findOne({
-          email: credentials.email,
-        });
-
-        if (!user) {
-          client.close();
-          throw new Error('아이디를 찾을 수 없습니다.');
-        }
-
-        const isValid = await verifyPassword(
-          credentials.password,
-          user.password
-        );
-
-        if (!isValid) {
-          client.close();
-          throw new Error('로그인 불가');
-        }
-        client.close();
         return { email: user.email };
-        
       },
     }),
   ],
