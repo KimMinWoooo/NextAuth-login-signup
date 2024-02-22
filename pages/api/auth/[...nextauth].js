@@ -14,13 +14,14 @@ export default NextAuth({
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              "Authorization": "Bearer {response.token}",
             },
             body: JSON.stringify({ email, password }),
           });
 
         const data = await response.json();
 
-
+        const token = data.token;
         
         return { email: data.email };
       },
