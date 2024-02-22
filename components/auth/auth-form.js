@@ -11,11 +11,12 @@ async function createUser(email, password, role) {
     body: JSON.stringify({ email, password, role }),
     headers: {
       "Content-Type": "application/json",
+      //"Authorization": `Bearer {토큰값}`,
     },
   });
 
   const data = await response.json();
-  
+
 
   if (!response.ok) {
     throw new Error(data.message || "Something went wrong!");
@@ -57,6 +58,7 @@ function AuthForm() {
       try {
         const result = await createUser(enteredEmail, enteredPassword, enteredRole);
         console.log(result);
+        
       } catch (error) {
         console.log(error);
       }
